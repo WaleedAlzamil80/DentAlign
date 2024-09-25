@@ -2,18 +2,15 @@ import torch
 import torch.nn.functional as F
 from tqdm import tqdm
 
-# Train function for the VAE model
+
 def train(model, optimizer, scheduler, train_loader, val_loader, device, args):
     train_loss = 0
     print("Start learning: ")
     for epoch in range(args.num_epochs):
         model.train()
 
-        for images, masks in tqdm(train_loader, desc=f'Epoch {epoch+1}/{args.num_epochs}'):
-            images, masks = images.to(device), masks.to(device)
-            masked_images = images * (1.0 - masks)
-            print(masked_images[0])
-            print(images[0])
+        for images, masked_images in tqdm(train_loader, desc=f'Epoch {epoch+1}/{args.num_epochs}'):
+            images, masked_images = images.to(device), masked_images.to(device)
 
             # Zero the gradients
             optimizer.zero_grad()
@@ -23,7 +20,7 @@ def train(model, optimizer, scheduler, train_loader, val_loader, device, args):
             
             # Compute loss
             loss = loss_function(reconstructed_images, images, mu, logvar)
-            
+
             # Backpropagation
             loss.backward()
             optimizer.step()
@@ -40,16 +37,16 @@ def train(model, optimizer, scheduler, train_loader, val_loader, device, args):
         # Validation step at the end of each epoch (optional)
         validate(model, val_loader, device, epoch, args)
 
-# Validation function
+
 def validate(model, val_loader, device, epoch, args):
     model.eval()
     val_loss = 0
     with torch.no_grad():
-        for images, masks in tqdm(val_loader, desc=f'Epoch {epoch+1}/{args.num_epochs}'):
-            images, masks = images.to(device), masks.to(device)
-            masked_images = images * (1.0 - masks)
+        for images, masked_images in tqdm(val_loader, desc=f'Epoch {epoch+1}/{args.num_epochs}'):
+            images, masked_images = images.to(device), masked_images.to(device)
+
             reconstructed_images, mu, logvar = model(masked_images)
-            
+
             loss = loss_function(reconstructed_images, images, mu, logvar)
             val_loss += loss.item()
     
@@ -57,7 +54,6 @@ def validate(model, val_loader, device, epoch, args):
     print(f"Validation Loss: {val_loss}")
 
 
-# Define the loss function for VAE
 def loss_function(reconstructed_x, x, mu, logvar):
     # Reconstruction loss (Binary Cross Entropy)
     recon_loss = F.mse_loss(reconstructed_x, x, reduction='sum')

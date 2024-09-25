@@ -7,4 +7,4 @@ batch_size = 32
 gamma = 0.75
 milestones = [10, 15, 20, 25]
 
-root_dir = '/home/waleed/Documents/3DLearning/DDS/DentAlign/archive'
+root_dir = '/home/waleed/Documents/3DLearning/DDS/SmileShift/archive'

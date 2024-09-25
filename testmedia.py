@@ -14,10 +14,10 @@ mp_drawing = mp.solutions.drawing_utils
 
 mp_drawing_styles = mp.solutions.drawing_styles
 
-path = "/home/waleed/Documents/3DLearning/DDS/DentAlign/dataset/LS3D-W-balanced-20-03-2017/new_dataset/7153.jpg"
+path = "/home/waleed/Documents/3DLearning/DDS/SmileShift/dataset/LS3D-W-balanced-20-03-2017/new_dataset/7153.jpg"
 sample_img = cv2.imread(path)
 
-face_mesh_results = face_mesh_images.process(sample_img)
+face_mesh_results = face_mesh_images.process((sample_img))
 
 
 LEFT_EYE_INDEXES = list(set(itertools.chain(*mp_face_mesh.FACEMESH_LEFT_EYE)))

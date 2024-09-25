@@ -14,10 +14,9 @@ def visual_analysis(model, test_loader, device, output_dir="reconstructed_images
     os.makedirs(output_dir, exist_ok=True)
 
     with torch.no_grad():
-        for batch_idx, (images, masks) in enumerate(test_loader):
+        for batch_idx, (images, masked_images) in enumerate(test_loader):
             images = images.to(device)
-            masks = masks.to(device)
-            masked_images = images * (1.0 - masks)
+            masked_images = masked_images.to(device)
 
             # Forward pass to reconstruct images
             reconstructed_images, _, _ = model(masked_images)
@@ -72,7 +71,20 @@ def plot_pca(points, labels=None, save_path='pca_plot.png'):
     plt.title('PCA Results (n x 2)')
     plt.xlabel('Principal Component 1')
     plt.ylabel('Principal Component 2')
-    
+
     # Save the plot instead of displaying it
     plt.savefig(save_path, bbox_inches='tight')
     plt.close()  # Close the figure to avoid displaying it in notebooks
+
+def plot_tensor_image(image_tensor):
+    # If the image is in [C, H, W], permute it to [H, W, C]
+    image = image_tensor.permute(1, 2, 0).cpu().numpy()
+
+    # If the image has 1 channel, we just remove the last dimension for grayscale display
+    if image.shape[2] == 1:
+        image = image.squeeze(-1)
+
+    # Plot the image
+    plt.imshow(image)
+    plt.axis('off')  # Turn off axis labels
+    plt.show()

@@ -1,6 +1,7 @@
 import torch
 from VAE.model import VAE
 from Dataset.transformation import JointTransform
+
 from train import train
 from Dataset.dataloader import get_dataLoader
 from utils.visual_analysis import visual_analysis
@@ -16,7 +17,9 @@ def parse_args():
 
     # Add arguments for each hyperparameter
     parser.add_argument('--path', type=str, default=root_dir, help="Path to the root of the dataset")
-    parser.add_argument('--shape', type=int, default=256, help="Shape of the image")
+    parser.add_argument('--shape', type=int, default=256, help="Shape of the image") 
+    parser.add_argument('--num_workers', type=int, default=4, help="Shape of the image") 
+
 
     parser.add_argument('--embedding_dim', type=int, default=embedding_dim, help="Embedding dimension")
     parser.add_argument('--learning_rate', type=float, default=learning_rate, help="Learning rate")
@@ -36,7 +39,7 @@ args = parse_args()
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 joint_transform = JointTransform(resize=(218, 178), horizontal_flip_prob=0.5, rotation_range=(-30, 30))
-train_loader, val_loader, test_loader = get_dataLoader(root_dir, args.batch_size, joint_transform, joint_transform)
+train_loader, val_loader, test_loader = get_dataLoader(root_dir, args.batch_size, args.num_workers, joint_transform, joint_transform)
 
 model = VAE(input_channels=3, latent_dim=args.embedding_dim).to(device)
 

@@ -28,7 +28,6 @@ class Encoder(nn.Module):
 
         # Flatten and compute mu and logvar
         x = x.view(x.size(0), -1)
-
         mu = self.fc_mu(x)
         logvar = self.fc_logvar(x)
         return mu, logvar
@@ -52,16 +51,15 @@ class Decoder(nn.Module):
     def forward(self, z, original):  # original -> (batch_size, 3, 218, 178)
         # Fully connected layer to reshape z
         z = self.fc(z)
-        z = z.view(z.size(0), 256, 14, 12)  # Reshape to the size before encoding
+        z = z.view(z.size(0), 256, 14, 12)
 
         # Apply transposed convolutional layers
-
         z = F.relu(self.deconv1(z))
         z = F.relu(self.deconv2(z))
         z = F.relu(self.deconv3(z))
         z = F.relu(self.deconv4(z))                   # (batch_size, 32, 218, 178)
         z = torch.concat([z, original], dim = 1)      # (batch_size, 35, 218, 178)
-        z = torch.sigmoid(self.deconv5(z))  # Use sigmoid for output to be between [0, 1]
+        z = torch.sigmoid(self.deconv5(z))            # map the output to be between [0, 1]
 
         return z
 

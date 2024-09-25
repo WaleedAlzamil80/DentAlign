@@ -8,7 +8,6 @@ import mediapipe as mp
 import itertools
 import torchvision.transforms as T
 
-
 class CelebADataset_Faces(Dataset):
     def __init__(self, root_dir, img_dir, partition='train', transform=None, filter_teeth_visible=True,):
         """
@@ -43,16 +42,14 @@ class CelebADataset_Faces(Dataset):
 
         # Filter the partition data based on smiling images if requested
         if self.filter_teeth_visible:
-            # smiling_data = self.attr_data[self.attr_data['Smiling'] == 1]
-            smiling_data = self.attr_data[(self.attr_data['Smiling'] == 1) | (self.attr_data['Mouth_Slightly_Open'] == 1)]
-
+            smiling_data = self.attr_data[(self.attr_data['Smiling'] == 1) & (self.attr_data['Mouth_Slightly_Open'] == 1)]
             self.partition_data = self.partition_data[self.partition_data['image_id'].isin(smiling_data['image_id'])]
 
         # We will only use the images and attributes that are part of the selected partition
         self.attr_data = self.attr_data.loc[self.partition_data.index]
 
     def process_single_image(self, rgb_image):
-        height, width = rgb_image.size
+        width, height = rgb_image.size
         result = self.face_mesh.process(np.array(rgb_image))
 
         if result.multi_face_landmarks:
@@ -62,7 +59,7 @@ class CelebADataset_Faces(Dataset):
             teeth_landmarks = [[face_landmarks.landmark[idx].x, face_landmarks.landmark[idx].y, face_landmarks.landmark[idx].z]
                                for idx in LIP_INDEXES]
 
-            scale = torch.tensor([height, width, 1.0])
+            scale = torch.tensor([width, height, 1.0])
             arr = torch.tensor(teeth_landmarks)
 
             mini = torch.min(arr, dim=0)[0]
@@ -93,26 +90,28 @@ class CelebADataset_Faces(Dataset):
 
         image_tensor = T.ToTensor()(image)
         mask = mask.unsqueeze(0).float()
+        
+        masked_tensor = image_tensor * (1-mask)
 
         if self.transform:
-            image_tensor, mask = self.transform(image_tensor, mask)
+            image_tensor, masked_tensor = self.transform(image_tensor, masked_tensor)
 
-        return image_tensor, mask
+        return image_tensor, masked_tensor
 
 
-def get_dataLoader(root_dir, batch_size, transform, test_transform):
+def get_dataLoader(root_dir, batch_size, num_workers, transform, test_transform):
     img_dir = os.path.join(root_dir, 'img_align_celeba', 'img_align_celeba')
-    num_workers = 1
+
     # For training data
     train_dataset = CelebADataset_Faces(root_dir=root_dir, img_dir=img_dir, partition='train', transform=transform)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, num_workers=num_workers, shuffle=True)
 
     # For validation data
     val_dataset = CelebADataset_Faces(root_dir=root_dir, img_dir=img_dir, partition='val', transform=transform)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, num_workers=num_workers, shuffle=False)
 
     # For testing data
     test_dataset = CelebADataset_Faces(root_dir=root_dir, img_dir=img_dir, partition='test', transform=test_transform)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=num_workers, shuffle=False)
 
     return train_loader, val_loader, test_loader
