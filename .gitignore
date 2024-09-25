@@ -1,0 +1,16 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.so
+
+# Virtual environments
+venv/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+archive/
+/dataset
+# Logs and temp files
+*.log
+*.tmp
