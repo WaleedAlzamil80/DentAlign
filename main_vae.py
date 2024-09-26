@@ -1,4 +1,5 @@
 import torch
+from torch import nn
 from VAE.model import VAE
 from Dataset.transformation import JointTransform
 
@@ -42,7 +43,7 @@ joint_transform = JointTransform(resize=(218, 178), horizontal_flip_prob=0.5, ro
 train_loader, val_loader, test_loader = get_dataLoader(root_dir, args.batch_size, args.num_workers, joint_transform, joint_transform)
 
 model = VAE(input_channels=3, latent_dim=args.embedding_dim).to(device)
-
+model = nn.DataParallel(model)
 optimizer = torch.optim.Adam(params=model.parameters(), lr=args.learning_rate, weight_decay=args.l2)
 scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, gamma=args.gamma, milestones=milestones)
 
