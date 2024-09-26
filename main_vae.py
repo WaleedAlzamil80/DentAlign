@@ -40,7 +40,7 @@ args = parse_args()
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 joint_transform = JointTransform(resize=(218, 178), horizontal_flip_prob=0.5, rotation_range=(-30, 30))
-train_loader, val_loader, test_loader = get_dataLoader(root_dir, args.batch_size, args.num_workers, joint_transform, joint_transform)
+train_loader, val_loader, test_loader = get_dataLoader(args, joint_transform, joint_transform)
 
 model = VAE(input_channels=3, latent_dim=args.embedding_dim).to(device)
 model = nn.DataParallel(model)

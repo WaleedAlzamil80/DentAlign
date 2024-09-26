@@ -99,19 +99,19 @@ class CelebADataset_Faces(Dataset):
         return image_tensor, masked_tensor
 
 
-def get_dataLoader(root_dir, batch_size, num_workers, transform, test_transform):
-    img_dir = os.path.join(root_dir, 'img_align_celeba', 'img_align_celeba')
+def get_dataLoader(args, transform, test_transform):
+    img_dir = os.path.join(args.path, 'img_align_celeba', 'img_align_celeba')
 
     # For training data
-    train_dataset = CelebADataset_Faces(root_dir=root_dir, img_dir=img_dir, partition='train', transform=transform)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, num_workers=num_workers, shuffle=True)
+    train_dataset = CelebADataset_Faces(root_dir=args.path, img_dir=img_dir, partition='train', transform=transform)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=True)
 
     # For validation data
-    val_dataset = CelebADataset_Faces(root_dir=root_dir, img_dir=img_dir, partition='val', transform=transform)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, num_workers=num_workers, shuffle=False)
+    val_dataset = CelebADataset_Faces(root_dir=args.path, img_dir=img_dir, partition='val', transform=transform)
+    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False)
 
     # For testing data
-    test_dataset = CelebADataset_Faces(root_dir=root_dir, img_dir=img_dir, partition='test', transform=test_transform)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=num_workers, shuffle=False)
+    test_dataset = CelebADataset_Faces(root_dir=args.path, img_dir=img_dir, partition='test', transform=test_transform)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False)
 
     return train_loader, val_loader, test_loader
