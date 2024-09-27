@@ -24,7 +24,7 @@ def visual_analysis(model, test_loader, device, output_dir="reconstructed_images
             # Save original and reconstructed images side by side for comparison
             for i in range(reconstructed_images.size(0)):
                 save_image(reconstructed_images[i], os.path.join(output_dir, f"reconstructed_{batch_idx}_{i}.png"))
-                save_image(images[i], os.path.join(output_dir, f"original_{batch_idx}_{i}.png"))
+                # save_image(images[i], os.path.join(output_dir, f"original_{batch_idx}_{i}.png"))
 
     print(f"Reconstructed images saved in {output_dir}")
 

@@ -15,3 +15,5 @@ archive/
 *.log
 *.tmp
 hmm.txt
+masked_version_of_Celeba/
+preteethai.py

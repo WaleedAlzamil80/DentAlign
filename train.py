@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
-
+from utils.visual_analysis import plot_tensor_image
 
 def train(model, optimizer, scheduler, train_loader, val_loader, device, args):
     train_loss = 0
@@ -10,6 +10,7 @@ def train(model, optimizer, scheduler, train_loader, val_loader, device, args):
         model.train()
 
         for images, masked_images in tqdm(train_loader, desc=f'Epoch {epoch+1}/{args.num_epochs}'):
+
             images, masked_images = images.to(device), masked_images.to(device)
 
             # Zero the gradients
@@ -27,7 +28,7 @@ def train(model, optimizer, scheduler, train_loader, val_loader, device, args):
 
             # Accumulate loss
             train_loss += loss.item()
-        
+
         # Apply learning rate scheduler if it's used
         if args.use_scheduler:
             scheduler.step()
